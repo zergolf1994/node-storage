@@ -45,6 +45,7 @@ module.exports = async (req, res) => {
       //check auto cancal
       if (stg_auto_cancle) {
         delete where.work;
+        delete where.active;
         const sv = await Storage.findOne({
           where,
           raw: true,
