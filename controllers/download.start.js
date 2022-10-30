@@ -55,6 +55,7 @@ module.exports = async (req, res) => {
           let ovdl = await Progress.findOne({
             where: {
               sid: sv?.id,
+              type: "storage",
               [Op.and]: Sequelize.literal(
                 `ABS(TIMESTAMPDIFF(SECOND , createdAt , NOW())) >= ${stg_auto_cancle}`
               ),
@@ -106,6 +107,7 @@ module.exports = async (req, res) => {
             let ca_ovdl = await Progress.findOne({
               where: {
                 sid: sv?.id,
+                type: "storage",
                 [Op.and]: Sequelize.literal(
                   `ABS(TIMESTAMPDIFF(SECOND , createdAt , NOW())) >= ${stg_auto_cancle}`
                 ),
@@ -203,8 +205,17 @@ module.exports = async (req, res) => {
 
     const i = Math.floor(Math.random() * FilesEmpty.length);
 
-    if (!FilesEmpty[0])
+    if (!FilesEmpty[0]) {
+      //update code 333 to 0
+      await Files.update(
+        { e_code: 0 },
+        {
+          where: { status: 2, code: 333 },
+          silent: true,
+        }
+      );
       return res.json({ status: false, msg: `Files not empty` });
+    }
 
     let file = FilesEmpty[i];
 
