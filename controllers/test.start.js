@@ -15,6 +15,8 @@ module.exports = async (req, res) => {
   try {
     if (!sv_ip) return res.json({ status: false });
 
+    //let setting = await SettingValue(true);
+
     let {
       stg_status,
       stg_dl_by,
@@ -36,7 +38,7 @@ module.exports = async (req, res) => {
 
     where.sv_ip = sv_ip;
     where.work = 0;
-    where.active = 1;
+    //where.active = 1;
 
     //find server
     const ServerEmpty = await Storage.findOne({ where });
@@ -134,13 +136,13 @@ module.exports = async (req, res) => {
     }
 
     if (ServerEmpty?.disk_percent >= (stg_max_use || 90)) {
-      await Storage.update(
+      /*await Storage.update(
         { active: 0 },
         {
           where: { sv_ip: sv_ip },
           silent: true,
         }
-      );
+      );*/
       return res.json({ status: false, msg: `Server disk not empty` });
     }
 
@@ -201,8 +203,12 @@ module.exports = async (req, res) => {
       limit: limit,
     });
 
-    const i = Math.floor(Math.random() * FilesEmpty.length);
+    FilesEmpty.forEach((row) => {
+      console.log(row?.slug);
+    });
 
+    const i = Math.floor(Math.random() * FilesEmpty.length);
+    console.log(i, FilesEmpty.length);
     if (!FilesEmpty[0])
       return res.json({ status: false, msg: `Files not empty` });
 
@@ -247,18 +253,18 @@ module.exports = async (req, res) => {
       data.slug = file?.slug;
       data.quality = "default";
 
-      const insert = await Progress.create(data);
+      //const insert = await Progress.create(data);
 
       //Update
-      await Storage.update(
+      /*await Storage.update(
         { work: 1 },
         {
           where: { id: data.sid },
           silent: true,
         }
-      );
+      );*/
 
-      if (file.e_code == 0) {
+      /*if(file.e_code == 0){
         await Files.update(
           { e_code: 1 },
           {
@@ -268,12 +274,8 @@ module.exports = async (req, res) => {
         );
       }
 
-      shell.exec(
-        `bash /home/node/shell/download.sh ${data?.slug}`,
-        { async: false, silent: false },
-        function (data) {}
-      );
-
+      shell.exec(`bash /home/node/shell/download.sh ${data?.slug}`, {async: false, silent: false}, function(data){});
+*/
       return res.json({
         status: true,
         msg: `Process default created`,
@@ -309,31 +311,27 @@ module.exports = async (req, res) => {
       data.type = "storage";
       data.slug = file?.slug;
 
-      const insert = await Progress.create(data);
+      //const insert = await Progress.create(data);
 
       //Update
-      await Storage.update(
-        { work: 1 },
-        {
-          where: { id: data.sid },
-          silent: true,
-        }
-      );
+      /*await Storage.update(
+          { work: 1 },
+          {
+            where: { id: data.sid },
+            silent: true,
+          }
+        );
 
-      await Files.update(
-        { e_code: 1 },
-        {
-          where: { id: file.id },
-          silent: true,
-        }
-      );
+        await Files.update(
+          { e_code: 1 },
+          {
+            where: { id: file.id },
+            silent: true,
+          }
+        );
 
-      shell.exec(
-        `bash /home/node/shell/download.sh ${data?.slug}`,
-        { async: false, silent: false },
-        function (data) {}
-      );
-
+        shell.exec(`bash /home/node/shell/download.sh ${data?.slug}`, {async: false, silent: false}, function(data){});
+*/
       return res.json({
         status: true,
         msg: `Process ${data.quality}`,
