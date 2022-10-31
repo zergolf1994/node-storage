@@ -71,4 +71,6 @@ for files in ${quality[@]}; do
 done
 sleep 2
 curl -sS "http://127.0.0.1:8888/slave/done?slug=${slug}&slave_ip=${sv_ip}"
+sleep 2
+curl -sS "http://${sv_ip}:8888/run"
 exit 1
