@@ -16,7 +16,9 @@ router.get("/disk/update", require("./controllers/disk.update"));
 router.get("/server/create", require("./controllers/server.create"));
 //gdrive info
 router.get("/gdrive/info", require("./controllers/gdrive.info"));
-
+//slave
+router.get("/slave/start", require("./controllers/slave.start"));
+router.get("/slave/done", require("./controllers/slave.done"));
 
 router.get("/test/start", require("./controllers/test.start"));
 
