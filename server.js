@@ -7,6 +7,9 @@ const path = require('path');
 const cors = require('cors');
 const app = express();
 
+global.files = "/home/files";
+global.dir = __dirname;
+
 require('dotenv').config();
 
 let corsOptions = {

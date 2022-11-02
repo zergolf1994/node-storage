@@ -1,5 +1,7 @@
 "use strict";
+
 const request = require("request");
+const fs = require("fs");
 const queryString = require("query-string");
 const User = require("../Mysql/Users");
 const Files = require("../Mysql/Files");
@@ -31,7 +33,36 @@ exports.SettingValue = async (e) => {
     return data;
   }
 };
+exports.getDirs = (path) => {
+  if (!path) return;
 
+  const get = (path) =>
+    fs
+      .readdirSync(path, {
+        withFileTypes: true,
+      })
+      .reduce((a, c) => {
+        c.isDirectory() && a.push(c.name);
+        return a;
+      }, []);
+
+  return get(path);
+};
+exports.getFiles = (path) => {
+  if (!path) return;
+
+  const get = (path) =>
+    fs
+      .readdirSync(path, {
+        withFileTypes: true,
+      })
+      .reduce((a, c) => {
+        c.isFile() && a.push(c.name);
+        return a;
+      }, []);
+
+  return get(path);
+};
 exports.ExistsUsersName = async (username) => {
   let data = {};
   try {
@@ -68,10 +99,12 @@ exports.ExistsEmail = async (email) => {
   }
   return data;
 };
-exports.ExistsDir = async (title , uid) => {
+exports.ExistsDir = async (title, uid) => {
   let data = {};
   try {
-    const result = await Files.findOne({ where: { title: title , type : "0f" , uid: uid } });
+    const result = await Files.findOne({
+      where: { title: title, type: "0f", uid: uid },
+    });
     if (result) {
       data.status = true;
       data.result = result;
@@ -86,10 +119,12 @@ exports.ExistsDir = async (title , uid) => {
   return data;
 };
 
-exports.ExistsLinks = async (uid , type , source) => {
+exports.ExistsLinks = async (uid, type, source) => {
   let data = {};
   try {
-    const result = await Files.findOne({ where: { uid: uid , type : type ,  source: source } });
+    const result = await Files.findOne({
+      where: { uid: uid, type: type, source: source },
+    });
     if (result) {
       data.status = true;
       data.result = result;
@@ -107,7 +142,7 @@ exports.ExistsLinks = async (uid , type , source) => {
 exports.FindDir = async (slug) => {
   let data = {};
   try {
-    const result = await Files.findOne({ where: { type : "0f" , slug: slug } });
+    const result = await Files.findOne({ where: { type: "0f", slug: slug } });
     if (result) {
       data.status = true;
       data.result = result;
@@ -178,15 +213,15 @@ exports.getDatagDrive = async (gid) => {
     request(url, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         const parsed = queryString.parse(response.body);
-        if(parsed?.title){
-          data.title = parsed?.title
+        if (parsed?.title) {
+          data.title = parsed?.title;
         }
-        if(parsed?.public){
-          data.public = parsed?.public
+        if (parsed?.public) {
+          data.public = parsed?.public;
         }
         resolve(data);
       } else {
-        reject()
+        reject();
       }
     });
   });

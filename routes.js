@@ -20,6 +20,15 @@ router.get("/gdrive/info", require("./controllers/gdrive.info"));
 router.get("/slave/start", require("./controllers/slave.start"));
 router.get("/slave/done", require("./controllers/slave.done"));
 
+//delete files
+//delete one file
+
+//delete bulkfiles
+
+//get tree file
+router.get("/files/list", require("./controllers/files.lists"));
+router.get("/files/check", require("./controllers/files.check"));
+
 router.get("/test/start", require("./controllers/test.start"));
 
 router.all("*", function (req, res) {
