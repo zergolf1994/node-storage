@@ -8,13 +8,14 @@ const Progress = require("../modules/Mysql/Progress");
 const FilesVideo = require("../modules/Mysql/FilesVideo");
 const { Sequelize, Op } = require("sequelize");
 const shell = require("shelljs");
-const { GenerateID, SettingValue } = require("../modules/Function");
+const { GenerateID, SettingValue, timeSleep } = require("../modules/Function");
 
 module.exports = async (req, res) => {
   const { sv_ip, slug } = req.query;
   try {
     if (!sv_ip) return res.json({ status: false });
 
+    await timeSleep();
     let {
       stg_status,
       stg_dl_by,
