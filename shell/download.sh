@@ -25,7 +25,7 @@ for files in ${quality[@]}; do
 	else
 		token=$(echo $call | jq -r '.data.token')
 
-		title=$(echo $call | jq -r '.data.title')
+		title=$(echo $call | jq -r '.data.quality')
 		backup=$(echo $call | jq -r '.data.backup')
 		quality=$(echo $call | jq -r '.data.quality')
 
@@ -64,7 +64,7 @@ for files in ${quality[@]}; do
 			sleep 1
 			mv ${tmp_file} ${file_save}
 			sudo rm -rf ${tmp_download}
-			curl -sS "http://127.0.0.1:8888/download/done?slug=${slug}&quality=${quality}"
+			curl -sS "http://127.0.0.1:8888/download/done?slug=${slug}&quality=${quality}&token=${token}"
 			sleep 3
 		fi
 	fi
@@ -75,5 +75,5 @@ curl -sS "http://127.0.0.1:8888/download/done?slug=${slug}"
 sleep 3
 bash /home/node/shell/update-disk.sh > /dev/null &
 sleep 2
-curl -sS "http://127.0.0.1:8888/download/start?sv_ip=${localip}"
+#curl -sS "http://127.0.0.1:8888/download/start?sv_ip=${localip}"
 exit 1

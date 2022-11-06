@@ -8,9 +8,10 @@ router.all("/", (req, res) =>
 );
 
 router.get("/run", require("./controllers/run"));
-router.get("/download/start", require("./controllers/download.start"));
-router.get("/download/data", require("./controllers/download.data"));
-router.get("/download/done", require("./controllers/download.done"));
+router.get("/dl/run", require("./controllers/dl.run"));
+router.get("/download/start", require("./controllers/dl.start"));
+router.get("/download/data", require("./controllers/dl.data"));
+router.get("/download/done", require("./controllers/dl.done"));
 router.get("/disk/update", require("./controllers/disk.update"));
 //server
 router.get("/server/create", require("./controllers/server.create"));
