@@ -58,7 +58,95 @@ module.exports = async (req, res) => {
 
     if (!storage) {
       //เช็ค process file
+      if (stg_auto_cancle) {
+        const sv = await Storage.findOne({
+          where: {
+            sv_ip: sv_ip,
+            type: "storage",
+          },
+          raw: true,
+          attributes: ["id"],
+        });
+
+        if (sv?.id) {
+          let ovdl = await Progress.findOne({
+            where: {
+              sid: sv?.id,
+              type: "storage",
+              [Op.and]: Sequelize.literal(
+                `ABS(TIMESTAMPDIFF(SECOND , createdAt , NOW())) >= ${stg_auto_cancle}`
+              ),
+            },
+            raw: true,
+          });
+          if (!ovdl)
+            return res.json({ status: false, msg: "server_is_busy", e: 1 });
+
+          let quality_process = ovdl?.quality?.split(",");
+
+          if (!quality_process.length)
+            return res.json({ status: false, msg: "server_is_busy", e: 2 });
+
+          let videos = await FilesVideo.findAll({
+            raw: true,
+            where: {
+              slug: ovdl?.slug,
+              quality: { [Op.or]: quality_process },
+            },
+          });
+
+          if (!videos.length) {
+            await Files.update(
+              { e_code: 333 },
+              {
+                where: { id: ovdl?.fid },
+                silent: true,
+              }
+            );
+          } else {
+            let data = {};
+            if (videos.length > 1) {
+              data.status = 5;
+            } else {
+              data.status = 3;
+            }
+            data.e_code = 0;
+            await Files.update(data, {
+              where: { id: ovdl?.fid },
+              silent: true,
+            });
+          }
+
+          // delete process
+          await Progress.destroy({ where: { id: ovdl?.id } });
+
+          await Storage.update(
+            { work: 0 },
+            {
+              where: { id: sv?.id },
+              silent: true,
+            }
+          );
+
+          shell.exec(
+            `bash ${global.dir}/shell/run.sh`,
+            { async: false, silent: false },
+            function (data) {}
+          );
+        }
+      }
       return res.json({ status: false, msg: "server_is_busy" });
+    }
+
+    if (storage?.disk_percent >= (stg_max_use || 90)) {
+      await Storage.update(
+        { active: 0 },
+        {
+          where: { sv_ip: sv_ip },
+          silent: true,
+        }
+      );
+      return res.json({ status: false, msg: `Server disk not empty` });
     }
     // check status all
     if (stg_status != 1)
@@ -164,7 +252,7 @@ module.exports = async (req, res) => {
         slug: file?.slug,
       },
     });*/
-    
+
     const create = await Progress.create(process_data);
 
     /*return res.json({

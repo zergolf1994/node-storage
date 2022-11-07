@@ -36,9 +36,11 @@ module.exports = async (req, res) => {
       let data = {};
       if (file?.status == 4) {
         data.status = 5;
-        if(pc?.quality !== "default"){
-            //delete default video
-            await FilesVideo.destroy({ where: { slug: slug , quality:"default" } });
+        if (pc?.quality !== "default") {
+          //delete default video
+          await FilesVideo.destroy({
+            where: { slug: slug, quality: "default" },
+          });
         }
       } else {
         data.status = 3;
@@ -59,13 +61,20 @@ module.exports = async (req, res) => {
       );
       // delete process
       await Progress.destroy({ where: { id: pc?.id } });
+
+      shell.exec(
+        `bash ${global.dir}/shell/run.sh`,
+        { async: false, silent: false },
+        function (data) {}
+      );
+
       return res.json({ status: true, msg: "download_done" });
     } else {
       if (!token) return res.json({ status: false, msg: "not_token_file" });
       // update files_video done
 
       await FilesVideo.update(
-        { active: 1, sv_id: pc?.sid },
+        { active: 1, sv_id: pc?.sid, uid: pc?.uid },
         {
           where: { slug: slug, token: token },
           silent: true,
