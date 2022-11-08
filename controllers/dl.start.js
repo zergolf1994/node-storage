@@ -119,7 +119,17 @@ module.exports = async (req, res) => {
 
           // delete process
           await Progress.destroy({ where: { id: ovdl?.id } });
+        }
 
+        // check process count
+        let pvcount = await Progress.count({
+          where: {
+            sid: sv?.id,
+            type: "storage",
+          },
+        });
+
+        if (!pvcount) {
           await Storage.update(
             { work: 0 },
             {
