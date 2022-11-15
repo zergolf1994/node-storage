@@ -27,26 +27,29 @@ const getFiles = (source) =>
 let inputPath;
 module.exports = async (req, res) => {
   const { token, file } = req.query;
+  try {
+    let data = {};
 
-  let data = {};
+    if (token && !file) {
+      let getdir = path.join(global.files, token);
+      data.token = token;
+      data.files = getFiles(getdir);
+    } else if (token && file) {
+      inputPath = path.join(global.files, token, file);
 
-  if (token && !file) {
-    let getdir = path.join(global.files, token);
-    data.token = token;
-    data.files = getFiles(getdir);
-  } else if (token && file) {
-    inputPath = path.join(global.files, token, file);
+      data.token = token;
+      data.file = file;
+      data.video_data = await getVideoData();
+    } else {
+      let allDir = getDirs(global.files);
+      data.count = allDir.length;
+      data.token = allDir;
+    }
 
-    data.token = token;
-    data.file = file;
-    data.video_data = await getVideoData();
-  } else {
-    let allDir = getDirs(global.files);
-    data.count = allDir.length;
-    data.token = allDir;
+    return res.status(200).json({ data });
+  } catch (error) {
+    return res.json({ status: false, msg: error.name });
   }
-
-  return res.status(200).json({ data });
 };
 
 function getVideoData() {

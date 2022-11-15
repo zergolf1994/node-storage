@@ -21,10 +21,8 @@ router.get("/gdrive/info", require("./controllers/gdrive.info"));
 router.get("/slave/start", require("./controllers/slave.start"));
 router.get("/slave/done", require("./controllers/slave.done"));
 
-//delete files
-//delete one file
-
-//delete bulkfiles
+//add token gdrive
+router.get("/gdrive/token", require("./controllers/gdrive.token"));
 
 //get tree file
 router.get("/files/list", require("./controllers/files.lists"));
