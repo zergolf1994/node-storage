@@ -32,11 +32,22 @@ module.exports = async (req, res) => {
 
     if (token && !file) {
       let getdir = path.join(global.files, token);
+      if (!fs.existsSync(getdir)) {
+        return res.json({ status: false, msg: "not_found_folder" });
+      }
       data.token = token;
       data.files = getFiles(getdir);
     } else if (token && file) {
-      inputPath = path.join(global.files, token, file);
+      let getdir = path.join(global.files, token);
+      if (!fs.existsSync(getdir)) {
+        return res.json({ status: false, msg: "not_found_folder" });
+      }
+      let files = getFiles(getdir);
+      if (!files.includes(file)) {
+        return res.json({ status: false, msg: "not_found_video" });
+      }
 
+      inputPath = path.join(global.files, token, file);
       data.token = token;
       data.file = file;
       data.video_data = await getVideoData();
@@ -46,22 +57,27 @@ module.exports = async (req, res) => {
       data.token = allDir;
     }
 
-    return res.status(200).json({ data });
+    return res.status(200).json({ status: true, data });
   } catch (error) {
+    console.log(error);
     return res.json({ status: false, msg: error.name });
   }
 };
 
 function getVideoData() {
-  return new Promise((resolve, reject) => {
-    if (!inputPath) {
-      resolve({});
-    }
-    ffmpeg(inputPath).ffprobe((err, data) => {
-      if (err) {
-        reject(err);
+  if (fs.existsSync(inputPath)) {
+    return new Promise((resolve, reject) => {
+      if (!inputPath) {
+        resolve({});
       }
-      resolve(data);
+      ffmpeg(inputPath).ffprobe((err, data) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
+      });
     });
-  });
+  } else {
+    return;
+  }
 }

@@ -1,0 +1,11 @@
+pm2 delete all
+rm -rf /home/node/
+wget https://github.com/zergolf1994/node-storage/archive/refs/heads/master.zip -O /home/storage.zip
+cd /home && unzip storage.zip && rm -rf /home/storage.zip && cd
+cd /home &&  mv node-storage-master node
+wget http://api.zembed.xyz/install/storage/env -O /home/node/.env
+cd /home/node/ && npm install &&  pm2 start cluster.js --name=server-storage
+sudo dos2unix /home/node/shell/download.sh
+sudo dos2unix /home/node/shell/run.sh
+sudo dos2unix /home/node/shell/update-disk.sh
+pm2 log
